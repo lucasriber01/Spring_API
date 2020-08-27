@@ -7,5 +7,7 @@ import com.lucas.curso.domain.Produto;
 
 @Repository
 public interface ProdutoRepository extends JpaRepository<Produto, Integer> {
+	
+	
 
 }
