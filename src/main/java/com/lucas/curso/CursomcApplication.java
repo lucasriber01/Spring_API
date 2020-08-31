@@ -13,6 +13,7 @@ import com.lucas.curso.domain.Cidade;
 import com.lucas.curso.domain.Cliente;
 import com.lucas.curso.domain.Endereco;
 import com.lucas.curso.domain.Estado;
+import com.lucas.curso.domain.ItemPedido;
 import com.lucas.curso.domain.Pagamento;
 import com.lucas.curso.domain.PagamentoComBoleto;
 import com.lucas.curso.domain.PagamentoComCartao;
@@ -25,6 +26,7 @@ import com.lucas.curso.repositories.CidadeRepository;
 import com.lucas.curso.repositories.ClienteRepository;
 import com.lucas.curso.repositories.EnderecoRepository;
 import com.lucas.curso.repositories.EstadoRepository;
+import com.lucas.curso.repositories.ItemPedidoRepository;
 import com.lucas.curso.repositories.PagamentoRepository;
 import com.lucas.curso.repositories.PedidoRepository;
 import com.lucas.curso.repositories.ProdutoRepository;
@@ -55,6 +57,9 @@ public class CursomcApplication implements CommandLineRunner {
 	
 	@Autowired
 	private PedidoRepository   pedidorepository;
+	
+	@Autowired
+	private ItemPedidoRepository   itempedidorepository;
 	
 	public static void main(String[] args) {
 		SpringApplication.run(CursomcApplication.class, args);
@@ -112,6 +117,20 @@ public class CursomcApplication implements CommandLineRunner {
 		Pagamento pgto1 = new PagamentoComCartao(null , EstadoPagamento.QUITADO, ped1, 6);
 		
 		Pagamento pgto2 = new PagamentoComBoleto(null, EstadoPagamento.PENDENTE, ped2, sdf.parse("15/10/2020  21:05"), null);
+		
+		ItemPedido ip1 = new ItemPedido(ped1, p1, 0.00, 1, 2000.00);
+		ItemPedido ip2 = new ItemPedido(ped1, p2, 0.00, 2, 80.00);
+		ItemPedido ip3 = new ItemPedido(ped2, p2, 100.00, 1, 800.00);
+		
+		ped1.getItens().addAll(Arrays.asList(ip1,ip2));
+		ped2.getItens().addAll(Arrays.asList(ip3));
+		
+		p1.getItens().addAll(Arrays.asList(ip1));
+		p2.getItens().addAll(Arrays.asList(ip3));
+		p3.getItens().addAll(Arrays.asList(ip2));
+
+
+
 
 		ped1.setPagamento(pgto1);
 		ped2.setPagamento(pgto2);
@@ -133,6 +152,7 @@ public class CursomcApplication implements CommandLineRunner {
 		enderecorepository.saveAll(Arrays.asList(e1,e2)); 
 		pedidorepository.saveAll(Arrays.asList(ped1,ped2));
 		pagamentorepository.saveAll(Arrays.asList(pgto1,pgto2));
+		itempedidorepository.saveAll(Arrays.asList(ip1,ip2,ip3));
 
 	}
 
