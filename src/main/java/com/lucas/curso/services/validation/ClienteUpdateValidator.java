@@ -2,46 +2,48 @@ package com.lucas.curso.services.validation;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.servlet.HandlerMapping;
 
 import com.lucas.curso.domain.Cliente;
-import com.lucas.curso.domain.enums.TipoCliente;
-import com.lucas.curso.dto.ClienteNewDTO;
+import com.lucas.curso.dto.ClienteDTO;
 import com.lucas.curso.repositories.ClienteRepository;
 import com.lucas.curso.resources.exception.FieldMessage;
-import com.lucas.curso.services.validation.utils.BR;
 
 
 
-public class ClienteInsertValidator implements ConstraintValidator<ClienteInsert, ClienteNewDTO> {
+public class ClienteUpdateValidator implements ConstraintValidator<ClienteUpdate, ClienteDTO> {
 
+	@Autowired
+	private HttpServletRequest request ; 
+	
     @Autowired
 	private ClienteRepository repo ;
 	
 	
 	@Override
-	public void initialize(ClienteInsert ann) {
+	public void initialize(ClienteUpdate ann) {
 	}
 
 	@Override
-	public boolean isValid(ClienteNewDTO objDto, ConstraintValidatorContext context) {
-
+	public boolean isValid(ClienteDTO objDto, ConstraintValidatorContext context) {
+		
+		
+		Map<String ,String > map =(Map<String ,String >) request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
+		Integer uriId =Integer.parseInt( map.get("id"));
+		
 		List<FieldMessage> list = new ArrayList<>();
 
-		if (objDto.getTipo().equals(TipoCliente.PESSOAFISICA.getCod()) && !BR.isValidCPF(objDto.getCpfOuCnpj())) {
-			list.add(new FieldMessage("cpfOuCnpj", "CPF inválido"));
-		}
 
-		if (objDto.getTipo().equals(TipoCliente.PESSOAJURIDICA.getCod()) && !BR.isValidCNPJ(objDto.getCpfOuCnpj())) {
-			list.add(new FieldMessage("cpfOuCnpj", "CNPJ inválido"));
-		}
 		
 		Cliente aux = repo.findByEmail(objDto.getEmail());
-		if(aux!=null) {
+		if(aux!=null && !aux.getId().equals(uriId)) {
 			list.add(new FieldMessage("emsil", "Email já Cadastrado"));
 		}
 
